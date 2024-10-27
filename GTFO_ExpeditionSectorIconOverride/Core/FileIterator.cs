@@ -36,7 +36,7 @@ public static class FileIterator
     
 
     private static string _assetsPath;
-    public static string AssetsPath => _assetsPath ??= Path.Combine(BepInEx.Paths.BepInExRootPath, "Assets", Plugin.NAME);
+    public static string AssetsPath => _assetsPath ??= Path.Combine(BepInEx.Paths.BepInExRootPath, "Assets", Plugin.ASSETS_SUB_FOLDER);
 
     private static string _rundownFoldersPath;
     public static string RundownRootPath => _rundownFoldersPath ??= Path.Combine(AssetsPath, "Rundowns/");

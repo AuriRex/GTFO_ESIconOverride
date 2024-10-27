@@ -1,8 +1,4 @@
-﻿using ExSeIcOv.Core;
-using System;
-using UnityEngine;
-
-namespace ExSeIcOv.Models;
+﻿namespace ExSeIcOv.Models;
 
 public class SectorOverrideImageData
 {

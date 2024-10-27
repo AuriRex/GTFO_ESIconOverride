@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Clonesoft.Json;
 using ExSeIcOv.Core;
-using ExSeIcOv.Core.Info;
 using UnityEngine;
 
 namespace ExSeIcOv.Models;

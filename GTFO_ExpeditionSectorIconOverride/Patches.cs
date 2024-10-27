@@ -1,12 +1,11 @@
-﻿using CellMenu;
+﻿using System;
+using System.Linq;
+using CellMenu;
 using ExSeIcOv.Components;
 using ExSeIcOv.Core;
 using ExSeIcOv.Core.Loaders;
 using ExSeIcOv.Extensions;
 using HarmonyLib;
-using System;
-using System.IO;
-using System.Linq;
 using UnityEngine;
 
 namespace ExSeIcOv;
@@ -23,10 +22,8 @@ public static class StartMainGame__Awake__Patch
 [HarmonyPatch(typeof(GlobalPopupMessageManager), nameof(GlobalPopupMessageManager.Setup))]
 public class GlobalPopupMessageManager__Setup__Patch
 {
-    public static void Postfix(GlobalPopupMessageManager __instance)
+    public static void Postfix()
     {
-        
-
         var prefabMap = GlobalPopupMessageManager.m_popupTypeToPrefabMap;
 
         if (prefabMap == null)
@@ -47,7 +44,7 @@ public class GlobalPopupMessageManager__Setup__Patch
 
         foreach (var contentChild in child.Children())
         {
-            IntelImageType type = IntelImageType.None;
+            var type = IntelImageType.None;
             switch (contentChild.name)
             {
                 case "IntelPicture_Muted":
@@ -63,34 +60,14 @@ public class GlobalPopupMessageManager__Setup__Patch
                     break;
             }
 
-            if (type != IntelImageType.None)
-            {
-                var setter = contentChild.gameObject.GetOrAddComponent<IntelImageSetter>();
-                setter.SetType(type);
-            }
+            if (type == IntelImageType.None)
+                continue;
+            
+            var setter = contentChild.gameObject.GetOrAddComponent<IntelImageSetter>();
+            setter.SetType(type);
         }
     }
 }
-
-//CM_ExpeditionWindow
-//public void Setup(CM_PageRundown_New basePage)
-/*[HarmonyPatch(typeof(CM_ExpeditionWindow), nameof(CM_ExpeditionWindow.Setup))]
-public class CM_ExpeditionWindow_Setup_Patch
-{
-    public static bool InMethod { get; private set; }
-
-    public static void Prefix()
-    {
-        InMethod = true;
-        SectorIconImageLoader.IsExpeditionDetailsWindowActive = true;
-    }
-
-    public static void Postfix()
-    {
-        InMethod = false;
-        SectorIconImageLoader.IsExpeditionDetailsWindowActive = false;
-    }
-}*/
 
 [HarmonyPatch(typeof(GameStateManager), nameof(GameStateManager.ChangeState))]
 public class GameStateManager__ChangeState__Patch
@@ -125,21 +102,14 @@ public class GameStateManager__ChangeState__Patch
     }
 }
 
-//CM_ExpeditionSectorIcon
-//public void Setup(LG_LayerType type, Transform root, bool visible, bool cleared, bool titleVisible = true, float alphaMaxBG = 0.5f, float alphaMaxSkull = 0.8f)
 [HarmonyPatch(typeof(CM_ExpeditionSectorIcon), nameof(CM_ExpeditionSectorIcon.Setup))]
 public class CM_ExpeditionSectorIcon__Setup__Patch
 {
     // Called for Main, Extreme and Overload
     public static void Postfix(CM_ExpeditionSectorIcon __instance, LevelGeneration.LG_LayerType type)
     {
-#warning TODO
-
         var sectorIconType = (SectorIconType)((int)type + 1);
 
-        /*
-         * Set Icon based off of json file per expedition
-         */
         SpriteRenderer skull;
         SpriteRenderer bg;
         switch (sectorIconType)

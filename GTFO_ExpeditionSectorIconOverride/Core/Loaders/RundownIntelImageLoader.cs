@@ -1,7 +1,4 @@
-﻿using ExSeIcOv.Interfaces;
-using ExSeIcOv.Models;
-using System.Collections.Generic;
-using ExSeIcOv.Core.Info;
+﻿using ExSeIcOv.Core.Info;
 using ExSeIcOv.Core.Inspectors;
 using UnityEngine;
 

@@ -1,5 +1,4 @@
-﻿using ExSeIcOv.Core;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ExSeIcOv.Models;
 

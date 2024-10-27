@@ -1,4 +1,5 @@
-﻿using BepInEx;
+﻿using System.Reflection;
+using BepInEx;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using ExSeIcOv.Components;
@@ -6,9 +7,6 @@ using ExSeIcOv.Core;
 using ExSeIcOv.Core.Loaders;
 using HarmonyLib;
 using Il2CppInterop.Runtime.Injection;
-using System.Linq;
-using System.Reflection;
-using UnityEngine;
 
 [assembly: AssemblyVersion(ExSeIcOv.Plugin.VERSION)]
 [assembly: AssemblyFileVersion(ExSeIcOv.Plugin.VERSION)]
@@ -23,6 +21,7 @@ public class Plugin : BasePlugin
     public const string NAME = "ExSeIcOv";
     public const string NAME_FULL = "ExpeditionSectorIconOverride";
     public const string VERSION = "0.0.1";
+    public const string ASSETS_SUB_FOLDER = "Overrides";
 
     internal static ManualLogSource L;
 
@@ -36,24 +35,17 @@ public class Plugin : BasePlugin
         ClassInjector.RegisterTypeInIl2Cpp<IntelImageSetter>();
         ClassInjector.RegisterTypeInIl2Cpp<SectorIconSetter>();
 
-        /*var monoBehaviourTypes = AccessTools.GetTypesFromAssembly(Assembly.GetExecutingAssembly()).Where(t => t.IsAssignableTo(typeof(MonoBehaviour))).ToArray();
-        Log.LogDebug($"Found {monoBehaviourTypes.Length} custom {nameof(MonoBehaviour)}s. Registering ...");
-        foreach(var type in monoBehaviourTypes)
-        {
-            ClassInjector.RegisterTypeInIl2Cpp(type);
-        }*/
-
         _harmony = new Harmony(GUID);
         _harmony.PatchAll(Assembly.GetExecutingAssembly());
     }
 
     internal static void Init()
     {
-        L.LogInfo("Loading Image assets ...");
+        L.LogInfo("Loading Override assets ...");
         FileIterator.Register<RundownIntelImageLoader>();
         FileIterator.Register<SectorIconConfigLoader>();
         FileIterator.Register<SectorIconImageLoader>();
         FileIterator.Init();
-        L.LogInfo("Image asset loading complete!");
+        L.LogInfo("Override asset loading complete!");
     }
 }

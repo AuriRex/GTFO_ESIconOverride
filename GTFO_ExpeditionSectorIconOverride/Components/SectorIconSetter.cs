@@ -2,7 +2,6 @@
 using ExSeIcOv.Core.Loaders;
 using Il2CppInterop.Runtime.Attributes;
 using Il2CppInterop.Runtime.InteropTypes.Fields;
-using System;
 using UnityEngine;
 
 namespace ExSeIcOv.Components;
