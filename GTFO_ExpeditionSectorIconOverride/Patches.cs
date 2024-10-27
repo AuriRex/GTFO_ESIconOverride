@@ -134,6 +134,9 @@ public class CM_ExpeditionSectorIcon__Setup__Patch
 
     internal static void AddSectorSetterComponent(CM_ExpeditionSectorIcon __instance, SectorIconType sectorIconType, SpriteRenderer skull, SpriteRenderer bg)
     {
+        if (__instance.name.StartsWith(Plugin.PREVENT_OVERRIDE_NAME_PREFIX))
+            return;
+        
         var isRundownTierMarker = null != __instance.gameObject.GetComponentInParents<CM_RundownTierMarker>();
 
         var iconSetter = __instance.gameObject.GetOrAddComponent<SectorIconSetter>();

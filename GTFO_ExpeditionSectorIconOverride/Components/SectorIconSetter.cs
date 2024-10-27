@@ -69,6 +69,12 @@ internal class SectorIconSetter : MonoBehaviour
         if (Type == SectorIconType.None)
             return;
 
+        if (name.StartsWith(Plugin.PREVENT_OVERRIDE_NAME_PREFIX))
+        {
+            Destroy(this);
+            return;
+        }
+        
         //Plugin.L.LogDebug($"DoThing: {Type}, isRTM:{IsRundownTierMarker}");
 
         if (RendererSkull != null)

@@ -22,6 +22,7 @@ public class Plugin : BasePlugin
     public const string NAME_FULL = "ExpeditionSectorIconOverride";
     public const string VERSION = "0.0.1";
     public const string ASSETS_SUB_FOLDER = "Overrides";
+    public const string PREVENT_OVERRIDE_NAME_PREFIX = "CUSTOM_";
 
     internal static ManualLogSource L;
 
