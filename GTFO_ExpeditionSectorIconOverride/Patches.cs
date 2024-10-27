@@ -6,12 +6,13 @@ using ExSeIcOv.Extensions;
 using HarmonyLib;
 using System;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace ExSeIcOv;
 
 [HarmonyPatch(typeof(StartMainGame), nameof(StartMainGame.Awake))]
-public static class StartMainGame_Awake_Patch
+public static class StartMainGame__Awake__Patch
 {
     public static void Postfix()
     {
@@ -20,7 +21,7 @@ public static class StartMainGame_Awake_Patch
 }
 
 [HarmonyPatch(typeof(GlobalPopupMessageManager), nameof(GlobalPopupMessageManager.Setup))]
-public class GlobalPopupMessageManager_Setup_Patch
+public class GlobalPopupMessageManager__Setup__Patch
 {
     public static void Postfix(GlobalPopupMessageManager __instance)
     {
@@ -73,7 +74,7 @@ public class GlobalPopupMessageManager_Setup_Patch
 
 //CM_ExpeditionWindow
 //public void Setup(CM_PageRundown_New basePage)
-[HarmonyPatch(typeof(CM_ExpeditionWindow), nameof(CM_ExpeditionWindow.Setup))]
+/*[HarmonyPatch(typeof(CM_ExpeditionWindow), nameof(CM_ExpeditionWindow.Setup))]
 public class CM_ExpeditionWindow_Setup_Patch
 {
     public static bool InMethod { get; private set; }
@@ -81,20 +82,53 @@ public class CM_ExpeditionWindow_Setup_Patch
     public static void Prefix()
     {
         InMethod = true;
-        SectorIconImageLoader.ExpeditionDetailsWindowActive = true;
+        SectorIconImageLoader.IsExpeditionDetailsWindowActive = true;
     }
 
     public static void Postfix()
     {
         InMethod = false;
-        SectorIconImageLoader.ExpeditionDetailsWindowActive = false;
+        SectorIconImageLoader.IsExpeditionDetailsWindowActive = false;
+    }
+}*/
+
+[HarmonyPatch(typeof(GameStateManager), nameof(GameStateManager.ChangeState))]
+public class GameStateManager__ChangeState__Patch
+{
+    public static void Postfix(eGameStateName nextState)
+    {
+        switch (nextState)
+        {
+            case eGameStateName.Generating:
+                SectorIconImageLoader.IsInExpedition = true;
+                // Local_1_2_0
+                // Local_1 <- Rundown, 1 <- Tier, 0 <- Index
+                var data = RundownManager.ActiveExpeditionUniqueKey.Split("_").Skip(2).ToArray();
+                
+                if (Enum.TryParse(data[0], out eRundownTier tier))
+                {
+                    SectorIconImageLoader.ExpeditionTier = tier;
+                }
+
+                if (int.TryParse(data[1], out var expeditionIndex))
+                {
+                    SectorIconImageLoader.ExpeditionIndex = expeditionIndex;
+                }
+                break;
+            case eGameStateName.Lobby:
+                SectorIconImageLoader.IsInExpedition = false;
+                break;
+            default:
+                break;
+        }
+
     }
 }
 
 //CM_ExpeditionSectorIcon
 //public void Setup(LG_LayerType type, Transform root, bool visible, bool cleared, bool titleVisible = true, float alphaMaxBG = 0.5f, float alphaMaxSkull = 0.8f)
 [HarmonyPatch(typeof(CM_ExpeditionSectorIcon), nameof(CM_ExpeditionSectorIcon.Setup))]
-public class CM_ExpeditionSectorIcon_Setup_Patch
+public class CM_ExpeditionSectorIcon__Setup__Patch
 {
     // Called for Main, Extreme and Overload
     public static void Postfix(CM_ExpeditionSectorIcon __instance, LevelGeneration.LG_LayerType type)
@@ -139,7 +173,7 @@ public class CM_ExpeditionSectorIcon_Setup_Patch
 }
 
 [HarmonyPatch(typeof(CM_ExpeditionSectorIcon), nameof(CM_ExpeditionSectorIcon.SetupAsFinishedAll))]
-public class CM_ExpeditionSectorIcon_SetupAsFinishedAll_Patch
+public class CM_ExpeditionSectorIcon__SetupAsFinishedAll__Patch
 {
     // Called PE exclusively
     public static void Postfix(CM_ExpeditionSectorIcon __instance)
@@ -148,34 +182,30 @@ public class CM_ExpeditionSectorIcon_SetupAsFinishedAll_Patch
         var skull = __instance.m_iconFinishedAllSkull;
         var bg = __instance.m_iconFinishedAllBG;
 
-        CM_ExpeditionSectorIcon_Setup_Patch.AddSectorSetterComponent(__instance, iconType, skull, bg);
+        CM_ExpeditionSectorIcon__Setup__Patch.AddSectorSetterComponent(__instance, iconType, skull, bg);
     }
 }
 
 //public void SetExpeditionInfo(string title, string rundownKey, ExpeditionInTierData data, eRundownTier tier, int expIndex, int expListID, eExpeditionIconStatus iconStatus)
-[HarmonyPatch(typeof(CM_ExpeditionWindow), nameof(CM_ExpeditionWindow.SetExpeditionInfo))]
-public class CM_ExpeditionWindow_SetExpeditionInfo_Patch
-{
-    public static void Prefix(CM_ExpeditionWindow __instance)
-    {
-
-    }
-}
+// [HarmonyPatch(typeof(CM_ExpeditionWindow), nameof(CM_ExpeditionWindow.SetExpeditionInfo))]
+// public class CM_ExpeditionWindow_SetExpeditionInfo_Patch
+// {
+//     public static void Prefix(CM_ExpeditionWindow __instance)
+//     {
+//
+//     }
+// }
 
 [HarmonyPatch(typeof(CM_ExpeditionWindow), nameof(CM_ExpeditionWindow.SetVisible))]
-public class CM_ExpeditionWindow_SetVisible_Patch
+public class CM_ExpeditionWindow__SetVisible__Patch
 {
-    public static void Postfix(CM_ExpeditionWindow __instance, bool visible, bool inMenuBar)
+    public static void Prefix(CM_ExpeditionWindow __instance, bool visible, bool inMenuBar)
     {
         if (inMenuBar)
             return;
 
-        SectorIconImageLoader.ExpeditionDetailsWindowActive = visible;
+        SectorIconImageLoader.IsExpeditionDetailsWindowActive = visible;
         SectorIconImageLoader.ExpeditionTier = __instance.m_tier;
         SectorIconImageLoader.ExpeditionIndex = __instance.m_expIndex;
-
-        var expInTier = __instance.m_data;
-        var index = __instance.m_expIndex;
-        var tier = __instance.m_tier;
     }
 }

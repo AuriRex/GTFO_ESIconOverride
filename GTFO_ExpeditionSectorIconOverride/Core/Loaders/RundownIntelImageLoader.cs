@@ -1,17 +1,28 @@
 ﻿using ExSeIcOv.Interfaces;
 using ExSeIcOv.Models;
 using System.Collections.Generic;
+using ExSeIcOv.Core.Info;
+using ExSeIcOv.Core.Inspectors;
 using UnityEngine;
+
+using RundownStorage = ExSeIcOv.Core.HiINeedDataStoredPerRundownPlease<ExSeIcOv.Models.IntelImageData>;
 
 namespace ExSeIcOv.Core.Loaders;
 
-internal class RundownIntelImageLoader : HiINeedDataStoredPerRundownPlease<IntelImageData>, IImageFileInspector
+internal class RundownIntelImageLoader : ImageFileInspector
 {
-    public string FolderName => "Intel";
-
-    public void InspectFile(uint rundownId, ImageFileInfo file)
+    private static RundownStorage _rundownStorage;
+    
+    public RundownIntelImageLoader()
     {
-        var data = GetOrCreate(rundownId);
+        _rundownStorage = new RundownStorage();
+    }
+    
+    public override string FolderName => "Intel";
+
+    public override void InspectFile(uint rundownId, ImageFileInfo file)
+    {
+        var data = _rundownStorage.GetOrCreate(rundownId);
         var name = file.FileNameLower;
 
         switch(name)
@@ -30,26 +41,26 @@ internal class RundownIntelImageLoader : HiINeedDataStoredPerRundownPlease<Intel
         }
     }
 
-    public void Finalize(uint rundownID)
+    public override void Finalize(uint rundownID)
     {
-        if (!TryGetData(rundownID, out var data))
+        if (!_rundownStorage.TryGetData(rundownID, out var data))
             return;
 
         if (!data.HasData)
         {
-            _rundownDataDict.Remove(rundownID);
+            _rundownStorage.Remove(rundownID);
         }
     }
 
     internal static void ApplyRundownIntelImage(IntelImageType type, SpriteRenderer renderer)
     {
-        if (!TryGetActiveRundownID(out var rundownID))
+        if (!Utils.TryGetActiveRundownID(out var rundownID))
         {
             Plugin.L.LogError($"Could not parse {nameof(RundownManager.ActiveRundownKey)}: \"{RundownManager.ActiveRundownKey}\"");
             return;
         }
 
-        if (!TryGetDataOrFallback(rundownID, out var data))
+        if (!_rundownStorage.TryGetDataOrFallback(rundownID, out var data))
         {
             return;
         }

@@ -50,9 +50,10 @@ public class Plugin : BasePlugin
     internal static void Init()
     {
         L.LogInfo("Loading Image assets ...");
-        ImageLoader.Register<RundownIntelImageLoader>();
-        ImageLoader.Register<SectorIconImageLoader>();
-        ImageLoader.Init();
+        FileIterator.Register<RundownIntelImageLoader>();
+        FileIterator.Register<SectorIconConfigLoader>();
+        FileIterator.Register<SectorIconImageLoader>();
+        FileIterator.Init();
         L.LogInfo("Image asset loading complete!");
     }
 }
