@@ -25,6 +25,8 @@ public class SectorIconConfigLoader : ConfigFileInspector
         if (name != CONFIG_FILE_NAME)
             return;
         
+        Plugin.L.LogInfo($"Loading config file '{file.FileName}' for rundown '{rundownId}'");
+        
         _rundownStorage.InsertData(rundownId, file.LoadAsJSONConfig<SectorSpecialOverrideConfig>());
     }
 
